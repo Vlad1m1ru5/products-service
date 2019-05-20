@@ -1,7 +1,7 @@
-var productsApi = Vue.resource('products{/id}');
+const productsApi = Vue.resource('products{/uuid}');
 
-function getUid(list, uuid) {
-    for (var i = 0; i < list.length; i++) {
+function getUuid(list, uuid) {
+    for (let i = 0; i < list.length; i++) {
         if (list[i].uuid === uuid) {
             return i;
         }
@@ -30,10 +30,10 @@ Vue.component('products-form', {
         '<div>' +
         '   <input type="text" placeholder="Наименование продукта" v-model="name"/>' +
         '   <input type="text" placeholder="Востребованность" v-model="demand"/>' +
-        '   <input type="button" value="Сохранить" @click="save"/>' +
+        '   <input type="button" value="Сохранить" @click="saveItem"/>' +
         '</div>',
     methods: {
-        save: function () {
+        saveItem: function () {
             const input = {
                 name: this.name,
                 demand: this.demand
@@ -42,7 +42,7 @@ Vue.component('products-form', {
             if (this.uuid) {
                 productsApi.update({uuid: this.uuid}, input).then(result =>
                     result.json().then(data => {
-                        const index = getUid(this.products, data.uuid);
+                        const index = getUuid(this.products, data.uuid);
                         this.products.splice(index, 1, data);
                         this.uuid = '';
                     })
@@ -67,15 +67,15 @@ Vue.component('products-row', {
         '<div >' +
         '   {{ product.name }} {{ product.demand }}' +
         '   <span style="position: absolute; right: 0px;">' +
-        '       <input type="button" value="Изменить" @click="edit"/>' +
-        '       <input type="button" value="Удалить" @click="del"/>' +
+        '       <input type="button" value="Изменить" @click="editItem"/>' +
+        '       <input type="button" value="Удалить" @click="deleteItem"/>' +
         '   </span>' +
         '</div>',
     methods: {
-        edit: function() {
+        editItem: function() {
             this.editProduct(this.product);
         },
-        del: function() {
+        deleteItem: function() {
             productsApi.remove({uuid: this.product.uuid}).then(result => {
                 if (result.ok) {
                     this.products.splice(this.products.indexOf(this.product), 1);
@@ -95,11 +95,11 @@ Vue.component('products-list', {
     template:
         '<div style="position: relative; width: 700px;">' +
         '   <products-form ' +
-        '   :products="products" ' +
-        '   :productInput="product">' +
+        '       :products="products" ' +
+        '       :productInput="product">' +
         '   </products-form>' +
         '   <products-row v-for="product in products" ' +
-        '       :key="product.uid" ' +
+        '       :key="product.uuid" ' +
         '       :product="product" ' +
         '       :editProduct="editProduct" ' +
         '       :products="products">' +
@@ -120,7 +120,7 @@ Vue.component('products-list', {
     }
 });
 
-var productsApp = new Vue({
+const app = new Vue({
     el: '#products',
     template: '<products-list :products="products"/>',
     data: {

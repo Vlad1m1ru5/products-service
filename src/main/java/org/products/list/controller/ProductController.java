@@ -17,8 +17,8 @@ public class ProductController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
 
     @Autowired
-    public ProductController(ProductRepository productRepo) {
-        this.productRepository = productRepo;
+    public ProductController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
     @GetMapping
@@ -37,13 +37,13 @@ public class ProductController {
     }
 
     @PutMapping("{uuid}")
-    public Product edit( @PathVariable("uuid") Product productFromRepo, @RequestBody Product product) {
+    public Product editProduct( @PathVariable("uuid") Product productFromRepo, @RequestBody Product product) {
         BeanUtils.copyProperties(product, productFromRepo, "uuid");
         return productRepository.save(productFromRepo);
     }
 
     @DeleteMapping("{uuid}")
-    public void delete(@PathVariable("uuid") Product productFromRepo) {
+    public void deleteProduct(@PathVariable("uuid") Product productFromRepo) {
         productRepository.delete(productFromRepo);
     }
 }
